@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Candi — Plataforma de Aprendizagem de Libras</title>
+
+  <!-- Fonte Moderna e Amigável: Nunito + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-main: #F7F3EB;
+      --bg-card: #FDFBF7;
+      --bg-elevated: #EFE9DC;
+      --text-main: #241C18;
+      --text-muted: #685B52;
+      --border-color: #DED5C5;
+      --accent-green: #1E4631;
+      --accent-green-dark: #11291C;
+      --accent-wine: #6E2030;
+      --accent-wine-dark: #45121D;
+      --vlibras-blue: #1351B4;
+      --vlibras-blue-dark: #09295E;
+    }
+
+    html.dark {
+      --bg-main: #1E1612;
+      --bg-card: #2A1F1A;
+      --bg-elevated: #352721;
+      --text-main: #F5EFE6;
+      --text-muted: #B8A99A;
+      --border-color: #44332A;
+      --accent-green: #58A87A;
+      --accent-green-dark: #387552;
+      --accent-wine: #D46A7E;
+      --accent-wine-dark: #9E4253;
+    }
+
+    body {
+      font-family: 'Nunito', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    /* Superfícies e Botões Táteis 3D (Inspiração Duolingo + Identidade Candi) */
+    .candi-card {
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-bottom-width: 4px;
+    }
+
+    .candi-elevated {
+      background-color: var(--bg-elevated);
+      border: 1.5px solid var(--border-color);
+    }
+
+    .btn-primary-3d {
+      background-color: var(--accent-green);
+      color: #FAF7F2;
+      border-bottom: 4px solid var(--accent-green-dark);
+      font-weight: 800;
+      transition: transform 0.1s ease, border-bottom-width 0.1s ease, filter 0.15s ease;
+    }
+    html.dark .btn-primary-3d {
+      color: #140E0B;
+    }
+    .btn-primary-3d:active {
+      border-bottom-width: 0px;
+      transform: translateY(3px);
+    }
+
+    .btn-wine-3d {
+      background-color: var(--accent-wine);
+      color: #FAF7F2;
+      border-bottom: 4px solid var(--accent-wine-dark);
+      font-weight: 800;
+      transition: transform 0.1s ease, border-bottom-width 0.1s ease, filter 0.15s ease;
+    }
+    html.dark .btn-wine-3d {
+      color: #140E0B;
+    }
+    .btn-wine-3d:active {
+      border-bottom-width: 0px;
+      transform: translateY(3px);
+    }
+
+    .btn-vlibras-3d {
+      background-color: var(--vlibras-blue);
+      color: #FFFFFF;
+      border-bottom: 4px solid var(--vlibras-blue-dark);
+      font-weight: 800;
+      transition: transform 0.1s ease, border-bottom-width 0.1s ease;
+    }
+    .btn-vlibras-3d:active {
+      border-bottom-width: 0px;
+      transform: translateY(3px);
+    }
+
+    /* Palavras Clicáveis VLibras */
+    .vlibras-word {
+      display: inline-block;
+      border-radius: 0.5rem;
+      padding: 0 0.2rem;
+      margin: 0 -0.1rem;
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 4px;
+      transition: all 0.15s ease;
+    }
+    .vlibras-word:hover {
+      background-color: rgba(19, 81, 180, 0.16);
+      color: #1351B4;
+      transform: translateY(-1px);
+    }
+    html.dark .vlibras-word:hover {
+      background-color: rgba(96, 165, 250, 0.22);
+      color: #93C5FD;
+    }
+    .vlibras-word-active {
+      background-color: #1351B4 !important;
+      color: #FFFFFF !important;
+      font-weight: 800;
+      text-decoration: none;
+      transform: scale(1.04);
+    }
+
+    /* Barra de rolagem fina */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(120, 105, 95, 0.35);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-28">
+
+  <!-- =====================================================================
+       PLUGIN OFICIAL VLIBRAS GOV.BR (FUNCIONA EM QUALQUER NAVEGADOR/SERVIDOR)
+       ===================================================================== -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      try {
+        if (window.VLibras) {
+          new window.VLibras.Widget('https://vlibras.gov.br/app');
+        }
+      } catch (err) {
+        console.warn('Aviso ao iniciar VLibras Widget:', err);
+      }
+    });
+  </script>
+
+  <!-- TOAST DE NOTIFICAÇÃO -->
+  <div id="toast-container" class="fixed top-16 right-4 z-50 hidden">
+    <div class="px-4 py-2.5 rounded-2xl shadow-xl text-xs font-extrabold flex items-center gap-2 bg-[#1351B4] text-white border-b-4 border-[#09295E]">
+      <i data-lucide="hand" class="w-4 h-4"></i>
+      <span id="toast-text">Pronto!</span>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       TOPO MINIMALISTA: MARCA CANDI + BONECO VLIBRAS + AÇÕES EM ÍCONES
+       ===================================================================== -->
+  <header class="sticky top-0 z-30 backdrop-blur-md border-b-2" style="background-color: color-mix(in srgb, var(--bg-main) 92%, transparent); border-color: var(--border-color);">
+    <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+      <!-- Marca Candi -->
+      <button type="button" onclick="app.navigate('inicio')" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <div class="w-10 h-10 rounded-2xl flex items-center justify-center btn-primary-3d">
+          <i data-lucide="hand" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="font-black text-lg sm:text-xl tracking-tight block leading-none">Candi</span>
+          <span class="text-[11px] font-bold opacity-70 block">Clique nas palavras = Sinal VLibras</span>
+        </div>
+      </button>
+
+      <!-- Barra de Ações Rápidas em Ícones -->
+      <div class="flex items-center gap-1.5">
+        <button type="button" onclick="app.triggerVLibras(app.state.vlibrasActivePhrase)" title="Abrir Tradutor Oficial VLibras Gov.br" class="px-3 py-2 rounded-2xl btn-vlibras-3d flex items-center gap-1.5 text-xs">
+          <i data-lucide="hand" class="w-4 h-4"></i>
+          <span id="header-vlibras-label" class="hidden sm:inline">VLibras: OLÁ</span>
+        </button>
+
+        <button type="button" onclick="app.navigate('biblioteca')" title="Sinais Dominados no Estúdio" class="px-3 py-2 rounded-2xl candi-card flex items-center gap-1.5 text-xs font-extrabold">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+          <span id="header-progress-count">1/10</span>
+        </button>
+
+        <button type="button" onclick="app.openCameraModal()" title="Espelho de Prática (Câmera)" class="p-2.5 rounded-2xl candi-card hover:opacity-80 transition">
+          <i data-lucide="camera" class="w-4 h-4" style="color: var(--accent-wine);"></i>
+        </button>
+
+        <button type="button" onclick="app.toggleTheme()" title="Alternar Tema Claro / Madeira Escuro" class="p-2.5 rounded-2xl candi-card hover:opacity-80 transition">
+          <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+
+        <button type="button" onclick="app.handleAdminLockClick()" id="admin-lock-btn" title="Painel Administrativo da Candi (Senha: 1234)" class="p-2.5 rounded-2xl candi-card opacity-75 hover:opacity-100 transition">
+          <i id="admin-lock-icon" data-lucide="lock" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       CONTEÚDO PRINCIPAL DINÂMICO
+       ===================================================================== -->
+  <main id="app-main" class="flex-1 max-w-5xl w-full mx-auto px-4 py-6"></main>
+
+  <!-- =====================================================================
+       BARRA DE ÍCONES PRINCIPAL (DOCK FLUTUANTE — INÍCIO, MÓDULOS, SINAIS, DESAFIOS)
+       ===================================================================== -->
+  <nav aria-label="Navegação Principal" class="fixed bottom-4 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
+    <div id="bottom-dock" class="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-2xl candi-card shadow-2xl backdrop-blur-md"></div>
+  </nav>
+
+  <!-- =====================================================================
+       MODAIS (SINAL + ESPELHO LADO A LADO, CÂMERA RÁPIDA, LOGIN ADMIN, EXCLUSÃO)
+       ===================================================================== -->
+  <div id="modal-root" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"></div>
+
+  <!-- =====================================================================
+       LÓGICA COMPLETA DA APLICAÇÃO + BANCO DE DADOS INDEXEDDB & FIREBASE
+       ===================================================================== -->
+  <script type="module">
+    // =========================================================================
+    // 1. DADOS PEDAGÓGICOS INICIAIS DA PROFESSORA CANDI (REGRA DE 3)
+    // =========================================================================
+    const INITIAL_MODULES = [
+      {
+        id: 'mod-1',
+        order: 1,
+        title: '1. Comunidade Surda',
+        duration: '4 sem',
+        active: true,
+        isAdaptable: false,
+        categoryTag: 'Cultura',
+        description: 'Percepção visual, identidade e contato.',
+        topics: ['Experiência visual', 'Identidade Surda', 'Etiqueta visual'],
+        supportMaterials: [
+          { title: 'Guia Visual', type: 'PDF' },
+          { title: 'Mapa Histórico', type: 'Visual' },
+          { title: 'Resumo Prático', type: 'Ficha' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        order: 2,
+        title: '2. Sinais e Fundamentos',
+        duration: '4 sem',
+        active: true,
+        isAdaptable: false,
+        categoryTag: 'Base',
+        description: 'Parâmetros visuais, datilologia e saudações.',
+        topics: ['Parâmetros da Libras', 'Datilologia fluida', 'Saudações e números'],
+        supportMaterials: [
+          { title: 'Parâmetros', type: 'Card' },
+          { title: 'Configurações', type: 'Grade' },
+          { title: 'Números', type: 'Guia' }
+        ]
+      },
+      {
+        id: 'mod-3',
+        order: 3,
+        title: '3. Cotidiano',
+        duration: '4 sem',
+        active: true,
+        isAdaptable: false,
+        categoryTag: 'Rotina',
+        description: 'Família, tempo, rotina e emoções.',
+        topics: ['Família e relações', 'Tempo e calendário', 'Sentimentos'],
+        supportMaterials: [
+          { title: 'Roteiro Diário', type: 'Prática' }
+        ]
+      },
+      {
+        id: 'mod-4',
+        order: 4,
+        title: '4. Gramática Visual',
+        duration: '5 sem',
+        active: true,
+        isAdaptable: false,
+        categoryTag: 'Estrutura',
+        description: 'Espaço, topicalização e classificadores.',
+        topics: ['Espaço e apontação', 'Tópico-Comentário', 'Classificadores'],
+        supportMaterials: [
+          { title: 'Ordem Frasal', type: 'Esquema' }
+        ]
+      },
+      {
+        id: 'mod-5',
+        order: 5,
+        title: '5. Especialização',
+        duration: 'Flexível',
+        active: true,
+        isAdaptable: true,
+        categoryTag: 'Sob Medida',
+        description: 'Aplicação prática na sua área.',
+        topics: ['Contexto Cristão', 'Área da Saúde', 'Audiovisual'],
+        supportMaterials: [
+          { title: 'Glossário Pessoal', type: 'Vivo' }
+        ]
+      }
+    ];
+
+    const INITIAL_LESSONS = [
+      {
+        id: 'les-101',
+        moduleId: 'mod-1',
+        order: 1,
+        title: 'Aula 1: Atenção Visual',
+        status: 'published',
+        duration: '45m',
+        intro: 'Contato visual, expressão e primeiros sinais.',
+        blocks: [
+          { id: 'b-1', type: 'titulo', content: 'Língua Espaço-Visual' },
+          {
+            id: 'b-2',
+            type: 'lista',
+            title: '3 Pilares Visuais',
+            items: [
+              'Olhar ativo mantém a conexão.',
+              'Expressão facial define a entonação.',
+              'Toque suave no ombro chama a atenção.'
+            ]
+          },
+          {
+            id: 'b-3',
+            type: 'video',
+            title: 'Saudação Inicial',
+            videoUrl: '',
+            signReference: 'OLÁ TUDO BEM OBRIGADO',
+            caption: 'Observe sobrancelhas e inclinação corporal.'
+          },
+          {
+            id: 'b-4',
+            type: 'exercicio',
+            question: 'O que marca uma pergunta em Libras?',
+            options: ['Velocidade das mãos', 'Expressão facial e corporal', 'Soletração rápida'],
+            correctIndex: 1,
+            explanation: 'Expressões faciais e corporais dão o tom gramatical.'
+          }
+        ]
+      },
+      {
+        id: 'les-102',
+        moduleId: 'mod-1',
+        order: 2,
+        title: 'Aula 2: Sinal Pessoal',
+        status: 'published',
+        duration: '40m',
+        intro: 'Identidade visual e batismo na comunidade surda.',
+        blocks: [
+          {
+            id: 'b-201',
+            type: 'destaque',
+            title: 'Regra de Ouro',
+            content: 'O sinal pessoal é recebido de uma pessoa surda.'
+          },
+          {
+            id: 'b-202',
+            type: 'lista',
+            title: 'Como se apresentar em 3 passos',
+            items: [
+              '1. Saudar com OLÁ e TUDO BEM',
+              '2. Sinalizar MEU NOME e soletrar',
+              '3. Mostrar MEU SINAL na comunidade'
+            ]
+          }
+        ]
+      },
+      {
+        id: 'les-201',
+        moduleId: 'mod-2',
+        order: 1,
+        title: 'Aula 1: Parâmetros do Sinal',
+        status: 'published',
+        duration: '50m',
+        intro: 'Formato da mão, onde fazer e expressão.',
+        blocks: [
+          {
+            id: 'b-301',
+            type: 'galeria',
+            title: 'Contraste Visual',
+            items: ['APRENDER (Testa)', 'SÁBADO (Boca)', 'PRATICAR (Frente)']
+          },
+          {
+            id: 'b-302',
+            type: 'exercicio',
+            question: 'O que muda entre APRENDER e SÁBADO?',
+            options: ['Formato da Mão', 'Lugar onde faz o sinal', 'Velocidade'],
+            correctIndex: 1,
+            explanation: 'Na testa é APRENDER; na boca é SÁBADO.'
+          }
+        ]
+      },
+      {
+        id: 'les-301',
+        moduleId: 'mod-3',
+        order: 1,
+        title: 'Aula 1: Família e Afeto',
+        status: 'published',
+        duration: '45m',
+        intro: 'Sinais de convivência e localização espacial.',
+        blocks: [
+          {
+            id: 'b-401',
+            type: 'destaque',
+            title: 'Espaço Visual',
+            content: 'Posicione cada familiar em um ponto à sua frente.'
+          }
+        ]
+      },
+      {
+        id: 'les-401',
+        moduleId: 'mod-4',
+        order: 1,
+        title: 'Aula 1: Ordem Visual',
+        status: 'published',
+        duration: '50m',
+        intro: 'Tempo, Lugar, Sujeito e Ação.',
+        blocks: [
+          {
+            id: 'b-501',
+            type: 'lista',
+            title: 'Sequência em 3 Atos',
+            items: ['1. QUANDO (Tempo)', '2. ONDE (Cenário)', '3. QUEM + AÇÃO']
+          }
+        ]
+      },
+      {
+        id: 'les-501',
+        moduleId: 'mod-5',
+        order: 1,
+        title: 'Aula 1: Prática Direcionada',
+        status: 'published',
+        duration: '50m',
+        intro: 'Sinais aplicados à sua trilha: Cristão, Saúde ou Audiovisual.',
+        blocks: [
+          {
+            id: 'b-601',
+            type: 'destaque',
+            title: 'Foco Prático',
+            content: 'Acolhimento direto no seu contexto real.'
+          }
+        ]
+      }
+    ];
+
+    const INITIAL_SIGNS = [
+      {
+        id: 'sig-1',
+        name: 'TUDO BEM?',
+        vlibrasGlosa: 'TUDO BEM',
+        category: 'Saudações',
+        moduleId: 'mod-1',
+        handshape: 'Mão aberta na boca + Polegar para cima',
+        location: 'Queixo -> Frente',
+        expression: 'Sobrancelhas erguidas',
+        candiExplanation: 'Sinal de BOM seguido do polegar positivo.',
+        videoUrl: '',
+        variations: [{ label: 'Forma curta', note: 'Apenas polegar + expressão.' }]
+      },
+      {
+        id: 'sig-2',
+        name: 'OBRIGADO(A)',
+        vlibrasGlosa: 'OBRIGADO',
+        category: 'Saudações',
+        moduleId: 'mod-1',
+        handshape: 'Mão plana reta',
+        location: 'Testa',
+        expression: 'Aceno suave + sorriso',
+        candiExplanation: 'Toque na testa movendo em direção à pessoa.',
+        videoUrl: '',
+        variations: [{ label: 'Duplo', note: 'Testa e peito simultâneos.' }]
+      },
+      {
+        id: 'sig-3',
+        name: 'SURDO',
+        vlibrasGlosa: 'SURDO',
+        category: 'Identidade',
+        moduleId: 'mod-1',
+        handshape: 'Dedo indicador apontado',
+        location: 'Orelha -> Queixo',
+        expression: 'Firme e natural',
+        candiExplanation: 'Toque próximo ao ouvido seguido do queixo.',
+        videoUrl: '',
+        variations: []
+      },
+      {
+        id: 'sig-4',
+        name: 'MEU SINAL',
+        vlibrasGlosa: 'MEU SINAL',
+        category: 'Identidade',
+        moduleId: 'mod-1',
+        handshape: 'Palma no peito + Sinal pessoal',
+        location: 'Peito -> Frente',
+        expression: 'Receptiva',
+        candiExplanation: 'Identificação visual própria na comunidade.',
+        videoUrl: '',
+        variations: []
+      },
+      {
+        id: 'sig-5',
+        name: 'APRENDER',
+        vlibrasGlosa: 'APRENDER',
+        category: 'Estudo',
+        moduleId: 'mod-2',
+        handshape: 'Mão abrindo e fechando',
+        location: 'Testa',
+        expression: 'Olhar focado',
+        candiExplanation: 'Sempre na testa. Na boca vira SÁBADO.',
+        videoUrl: '',
+        variations: []
+      },
+      {
+        id: 'sig-6',
+        name: 'PRATICAR',
+        vlibrasGlosa: 'PRATICAR',
+        category: 'Estudo',
+        moduleId: 'mod-2',
+        handshape: 'Duas mãos pareadas',
+        location: 'Espaço à frente',
+        expression: 'Constância',
+        candiExplanation: 'Movimento contínuo simbolizando treino.',
+        videoUrl: '',
+        variations: []
+      },
+      {
+        id: 'sig-7',
+        name: 'FAMÍLIA',
+        vlibrasGlosa: 'FAMILIA',
+        category: 'Cotidiano',
+        moduleId: 'mod-3',
+        handshape: 'Duas mãos em círculo',
+        location: 'Espaço à frente',
+        expression: 'Acolhedora',
+        candiExplanation: 'Mãos fazendo um círculo de união à frente.',
+        videoUrl: '',
+        variations: []
+      },
+      {
+        id: 'sig-8',
+        name: 'AMIGO(A)',
+        vlibrasGlosa: 'AMIGO',
+        category: 'Cotidiano',
+        moduleId: 'mod-3',
+        handshape: 'Mão aberta no peito',
+        location: 'Peito esquerdo',
+        expression: 'Afetuosa',
+        candiExplanation: 'Toque duplo sobre o coração.',
+        videoUrl: '',
+        variations: [{ label: 'Regional', note: 'Indicadores unidos.' }]
+      },
+      {
+        id: 'sig-9',
+        name: 'AJUDAR',
+        vlibrasGlosa: 'AJUDAR',
+        category: 'Especialização',
+        moduleId: 'mod-5',
+        handshape: 'Uma mão apoia a outra',
+        location: 'Espaço direcional',
+        expression: 'Empática',
+        candiExplanation: 'Sinal direcional: de mim para você.',
+        videoUrl: '',
+        variations: []
+      },
+      {
+        id: 'sig-10',
+        name: 'PAZ / CALMA',
+        vlibrasGlosa: 'PAZ',
+        category: 'Especialização',
+        moduleId: 'mod-5',
+        handshape: 'Palmas abertas descendo',
+        location: 'Peito -> Baixo',
+        expression: 'Serena',
+        candiExplanation: 'Movimento lento com ombros relaxados.',
+        videoUrl: '',
+        variations: []
+      }
+    ];
+
+    const INITIAL_CHALLENGES = [
+      {
+        id: 'chal-1',
+        title: 'Apresentação em 30s',
+        description: 'Saudação + Nome + Sinal.',
+        guidelines: '1. Enquadrar cintura ao topo.\n2. Soletrar sem pressa.\n3. Manter olhar na lente.',
+        deadline: 'Próxima aula',
+        moduleId: 'mod-1',
+        activityType: 'Vídeo',
+        status: 'published',
+        attachments: ['OLÁ', 'MEU NOME', 'MEU SINAL']
+      },
+      {
+        id: 'chal-2',
+        title: 'Par de Parâmetros',
+        description: 'Compare 2 sinais de mesma mão.',
+        guidelines: '1. Escolher 2 sinais.\n2. Contrastar o Lugar.\n3. Gravar no espelho.',
+        deadline: 'Livre',
+        moduleId: 'mod-2',
+        activityType: 'Prática',
+        status: 'published',
+        attachments: ['APRENDER', 'SÁBADO', 'SURDO']
+      },
+      {
+        id: 'chal-3',
+        title: '3 Frases Visuais',
+        description: 'Tempo -> Lugar -> Ação.',
+        guidelines: '1. Definir QUANDO.\n2. Posicionar ONDE.\n3. Sinalizar AÇÃO.',
+        deadline: 'Opcional',
+        moduleId: 'mod-4',
+        activityType: 'Estrutura',
+        status: 'published',
+        attachments: ['ONTEM CASA ESTUDAR', 'AMANHÃ TRABALHO IR']
+      }
+    ];
+
+    // =========================================================================
+    // 2. CAMADA DE PERSISTÊNCIA HÍBRIDA (INDEXEDDB NATIVO + FIREBASE OPCIONAL)
+    //    Garante funcionamento 100% fora da sandbox sem usar localStorage!
+    // =========================================================================
+    const DB_NAME = 'AppCandiLibrasDB_v1';
+    const STORE_NAME = 'candi_store';
+
+    function openIndexedDB() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          resolve(null);
+          return;
+        }
+        const req = window.indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const idb = e.target.result;
+          if (!idb.objectStoreNames.contains(STORE_NAME)) {
+            idb.createObjectStore(STORE_NAME);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function idbGet(key) {
+      const idb = await openIndexedDB();
+      if (!idb) return null;
+      return new Promise((resolve) => {
+        const tx = idb.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result ?? null);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function idbSet(key, val) {
+      const idb = await openIndexedDB();
+      if (!idb) return;
+      return new Promise((resolve) => {
+        const tx = idb.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.put(val, key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      });
+    }
+
+    // =========================================================================
+    // 3. TEXTO INTERATIVO — QUALQUER PALAVRA CLICADA ACIONA O VLIBRAS OFICIAL
+    // =========================================================================
+    function makeClickableWordsHTML(text, activeWord = '') {
+      if (!text) return '';
+      const tokens = String(text).split(/(\s+)/);
+      return tokens
+        .map((token) => {
+          if (/^\s+$/.test(token)) return token;
+          const clean = token.replace(/[.,!?;:()•"]/g, '').trim();
+          if (!clean) return token;
+          const isHighlighted = activeWord && activeWord.toLowerCase() === clean.toLowerCase();
+          const escaped = clean.replace(/'/g, "\\'");
+          return `<span role="button" tabindex="0" onclick="event.stopPropagation(); app.triggerVLibras('${escaped}')" class="vlibras-word ${isHighlighted ? 'vlibras-word-active' : ''}" title="Clique para ver o sinal de '${clean}' no VLibras">${token}</span>`;
+        })
+        .join('');
+    }
+
+    // =========================================================================
+    // 4. OBJETO GLOBAL `app` — CONTROLADOR COMPLETO DO APP CANDI
+    // =========================================================================
+    let activeMediaStream = null;
+    let activeMediaRecorder = null;
+    let recordedChunks = [];
+
+    const app = {
+      state: {
+        theme: 'light',
+        activeTab: 'inicio',
+        selectedModuleId: 'mod-1',
+        activeLessonId: null,
+        selectedSpecialization: 'Cristão',
+        studyMode: 'galeria', // 'galeria' | 'treino'
+        studyIndex: 0,
+        signSearch: '',
+        signCategoryFilter: 'Todas',
+        signModuleFilter: 'Todos',
+        vlibrasActivePhrase: 'OLÁ TUDO BEM',
+        customPhraseInput: 'Olá tudo bem? Eu quero aprender Libras hoje',
+        openParamCard: {}, // { [signId]: 'mao' | 'local' | 'expressao' }
+        modules: [...INITIAL_MODULES],
+        lessons: [...INITIAL_LESSONS],
+        signs: [...INITIAL_SIGNS],
+        challenges: [...INITIAL_CHALLENGES],
+        practicedIds: ['sig-1'],
+        completedChallengeIds: [],
+        exerciseAnswers: {},
+        isAdminUnlocked: false,
+        adminSubTab: 'modulos',
+        editingModule: null,
+        editingLesson: null,
+        lessonPreviewMode: false,
+        editingSign: null,
+        editingChallenge: null
+      },
+
+      async init() {
+        // Carrega dados persistidos no IndexedDB do navegador (funciona offline e fora da sandbox)
+        const savedModules = await idbGet('candi_modules');
+        const savedLessons = await idbGet('candi_lessons');
+        const savedSigns = await idbGet('candi_signs');
+        const savedChallenges = await idbGet('candi_challenges');
+        const savedProgress = await idbGet('candi_progress');
+        const savedTheme = await idbGet('candi_theme');
+
+        if (Array.isArray(savedModules) && savedModules.length) this.state.modules = savedModules;
+        if (Array.isArray(savedLessons) && savedLessons.length) this.state.lessons = savedLessons;
+        if (Array.isArray(savedSigns) && savedSigns.length) this.state.signs = savedSigns;
+        if (Array.isArray(savedChallenges) && savedChallenges.length) this.state.challenges = savedChallenges;
+        if (savedProgress) {
+          this.state.practicedIds = savedProgress.practicedIds || ['sig-1'];
+          this.state.completedChallengeIds = savedProgress.completedChallengeIds || [];
+          this.state.exerciseAnswers = savedProgress.exerciseAnswers || {};
+        }
+        if (savedTheme === 'dark') {
+          this.state.theme = 'dark';
+          document.documentElement.classList.add('dark');
+        }
+
+        this.renderAll();
+      },
+
+      async persistAll() {
+        await idbSet('candi_modules', this.state.modules);
+        await idbSet('candi_lessons', this.state.lessons);
+        await idbSet('candi_signs', this.state.signs);
+        await idbSet('candi_challenges', this.state.challenges);
+        await idbSet('candi_progress', {
+          practicedIds: this.state.practicedIds,
+          completedChallengeIds: this.state.completedChallengeIds,
+          exerciseAnswers: this.state.exerciseAnswers
+        });
+      },
+
+      notify(msg) {
+        const container = document.getElementById('toast-container');
+        const textEl = document.getElementById('toast-text');
+        if (!container || !textEl) return;
+        textEl.textContent = msg;
+        container.classList.remove('hidden');
+        clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => {
+          container.classList.add('hidden');
+        }, 2600);
+      },
+
+      toggleTheme() {
+        this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+        document.documentElement.classList.toggle('dark', this.state.theme === 'dark');
+        idbSet('candi_theme', this.state.theme);
+        this.renderAll();
+      },
+
+      navigate(tabId) {
+        this.stopCameraStream();
+        this.state.activeLessonId = null;
+        this.state.activeTab = tabId;
+        this.renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      openLesson(lessonId) {
+        this.state.activeLessonId = lessonId;
+        this.renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      // Aciona exclusivamente o Widget Oficial do VLibras (Gov.br)
+      triggerVLibras(rawPhrase) {
+        const cleanText = String(rawPhrase || '')
+          .replace(/[•()?!.,:;"]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (!cleanText) return;
+
+        this.state.vlibrasActivePhrase = cleanText;
+        this.notify(`Enviado para o VLibras Oficial: "${cleanText}"`);
+        this.renderAll();
+
+        try {
+          const accessBtn = document.querySelector('[vw-access-button]');
+          const wrapper = document.querySelector('[vw-plugin-wrapper]');
+          const isWrapperOpen =
+            wrapper &&
+            wrapper.classList.contains('active') &&
+            window.getComputedStyle(wrapper).display !== 'none';
+
+          if (accessBtn && !isWrapperOpen && accessBtn.classList.contains('active')) {
+            accessBtn.click();
+          }
+
+          let attempts = 15;
+          const tryTranslate = () => {
+            if (window.plugin && window.plugin.player && typeof window.plugin.player.translate === 'function') {
+              try {
+                window.plugin.player.translate(cleanText);
+                return;
+              } catch (e) {}
+            }
+            if (attempts > 0) {
+              attempts--;
+              setTimeout(tryTranslate, 450);
+            }
+          };
+          tryTranslate();
+        } catch (err) {
+          console.warn('Erro ao enviar para o VLibras:', err);
+        }
+      },
+
+      togglePracticedSign(signId) {
+        const idx = this.state.practicedIds.indexOf(signId);
+        if (idx >= 0) {
+          this.state.practicedIds.splice(idx, 1);
+        } else {
+          this.state.practicedIds.push(signId);
+        }
+        this.persistAll();
+        this.notify('Progresso de sinal atualizado!');
+        this.renderAll();
+      },
+
+      toggleCompletedChallenge(chalId) {
+        const idx = this.state.completedChallengeIds.indexOf(chalId);
+        if (idx >= 0) {
+          this.state.completedChallengeIds.splice(idx, 1);
+        } else {
+          this.state.completedChallengeIds.push(chalId);
+        }
+        this.persistAll();
+        this.notify('Status do desafio salvo!');
+        this.renderAll();
+      },
+
+      answerExercise(answerKey, optionIdx) {
+        this.state.exerciseAnswers[answerKey] = optionIdx;
+        this.persistAll();
+        this.renderAll();
+      },
+
+      toggleSignParam(signId, paramKey) {
+        if (this.state.openParamCard[signId] === paramKey) {
+          delete this.state.openParamCard[signId];
+        } else {
+          this.state.openParamCard[signId] = paramKey;
+        }
+        this.renderAll();
+      },
+
+      // =======================================================================
+      // CÂMERA / ESPELHO DE PRÁTICA VISUAL
+      // =======================================================================
+      stopCameraStream() {
+        if (activeMediaStream) {
+          activeMediaStream.getTracks().forEach((t) => t.stop());
+          activeMediaStream = null;
+        }
+        activeMediaRecorder = null;
+      },
+
+      async startCameraInElement(videoElementId, statusElementId) {
+        this.stopCameraStream();
+        const videoEl = document.getElementById(videoElementId);
+        const statusEl = document.getElementById(statusElementId);
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user' },
+            audio: false
+          });
+          activeMediaStream = stream;
+          if (videoEl) {
+            videoEl.srcObject = stream;
+            videoEl.classList.remove('hidden');
+          }
+          if (statusEl) statusEl.textContent = 'Câmera ativa (Espelho)';
+        } catch (err) {
+          if (statusEl) {
+            statusEl.textContent = 'Permita o acesso à câmera no navegador para usar o espelho.';
+          }
+        }
+      },
+
+      startRecordingCamera(playbackVideoId, onSavedCallback) {
+        if (!activeMediaStream || typeof MediaRecorder === 'undefined') {
+          this.notify('Abra a câmera primeiro para gravar.');
+          return;
+        }
+        recordedChunks = [];
+        activeMediaRecorder = new MediaRecorder(activeMediaStream);
+        activeMediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+        };
+        activeMediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Video = reader.result;
+            const playbackEl = document.getElementById(playbackVideoId);
+            if (playbackEl) {
+              playbackEl.src = base64Video;
+              playbackEl.classList.remove('hidden');
+            }
+            if (onSavedCallback) onSavedCallback(base64Video);
+            this.notify('Gravação pronta para revisão!');
+          };
+          reader.readAsDataURL(blob);
+        };
+        activeMediaRecorder.start();
+        this.notify('Gravando sinalização...');
+      },
+
+      stopRecordingCamera() {
+        if (activeMediaRecorder && activeMediaRecorder.state !== 'inactive') {
+          activeMediaRecorder.stop();
+        }
+      },
+
+      openCameraModal(signId = null) {
+        const modal = document.getElementById('modal-root');
+        const sign = signId ? this.state.signs.find((s) => s.id === signId) : null;
+
+        modal.innerHTML = `
+          <div onclick="event.stopPropagation()" class="${sign ? 'max-w-2xl' : 'max-w-md'} w-full rounded-3xl candi-card p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="camera" class="w-5 h-5" style="color: var(--accent-wine);"></i>
+                <h3 class="font-extrabold text-base">${sign ? `Treino com Espelho: ${sign.name}` : 'Espelho Visual de Prática'}</h3>
+              </div>
+              <button type="button" onclick="app.closeModal()" class="p-2 rounded-full candi-elevated">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            ${
+              sign
+                ? `
+              <div class="p-3.5 rounded-2xl candi-elevated flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="text-xs font-extrabold block">${sign.name}</span>
+                  <span class="text-xs opacity-75">${sign.candiExplanation || ''}</span>
+                </div>
+                <button type="button" onclick="app.triggerVLibras('${(sign.vlibrasGlosa || sign.name).replace(/'/g, "\\'")}')" class="px-3.5 py-2 rounded-xl btn-vlibras-3d text-xs flex items-center gap-1.5">
+                  <i data-lucide="hand" class="w-3.5 h-3.5"></i>
+                  <span>Ver no VLibras</span>
+                </button>
+              </div>
+            `
+                : ''
+            }
+
+            <div class="space-y-3 candi-elevated p-4 rounded-2xl">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span id="modal-cam-status" class="text-xs font-extrabold opacity-75">Clique em Abrir Câmera</span>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="app.startCameraInElement('modal-cam-preview', 'modal-cam-status')" class="px-3 py-1.5 rounded-xl btn-primary-3d text-xs flex items-center gap-1">
+                    <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                    <span>Abrir Câmera</span>
+                  </button>
+                  <button type="button" onclick="app.startRecordingCamera('modal-cam-recorded')" class="px-3 py-1.5 rounded-xl btn-wine-3d text-xs flex items-center gap-1">
+                    <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                    <span>Gravar</span>
+                  </button>
+                  <button type="button" onclick="app.stopRecordingCamera()" class="px-2.5 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-extrabold">
+                    Parar
+                  </button>
+                </div>
+              </div>
+              <video id="modal-cam-preview" autoplay playsinline muted class="hidden w-full aspect-video rounded-xl bg-black object-cover scale-x-[-1]"></video>
+              <video id="modal-cam-recorded" controls class="hidden w-full max-h-44 rounded-xl bg-black"></video>
+            </div>
+          </div>
+        `;
+        modal.classList.remove('hidden');
+        modal.onclick = () => this.closeModal();
+        lucide.createIcons();
+      },
+
+      closeModal() {
+        this.stopCameraStream();
+        const modal = document.getElementById('modal-root');
+        modal.classList.add('hidden');
+        modal.innerHTML = '';
+      },
+
+      // =======================================================================
+      // PAINEL ADMINISTRATIVO DA CANDI (SENHA: 1234 + BACKUP JSON)
+      // =======================================================================
+      handleAdminLockClick() {
+        if (this.state.isAdminUnlocked) {
+          this.navigate('admin');
+          return;
+        }
+        const modal = document.getElementById('modal-root');
+        modal.innerHTML = `
+          <form onsubmit="event.preventDefault(); app.verifyAdminPassword();" onclick="event.stopPropagation()" class="max-w-xs w-full rounded-3xl candi-card p-5 shadow-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-sm flex items-center gap-2">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+                Painel da Candi
+              </span>
+              <button type="button" onclick="app.closeModal()" class="p-1 rounded-full">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <input id="admin-pass-input" type="password" placeholder="Senha (1234)" class="w-full px-3.5 py-2.5 rounded-xl candi-elevated text-sm font-bold focus:outline-none" autofocus />
+            <p id="admin-pass-error" class="text-xs text-rose-500 font-bold hidden">Senha incorreta (use 1234)</p>
+            <button type="submit" class="w-full py-2.5 rounded-xl text-xs btn-primary-3d">Entrar no Painel</button>
+          </form>
+        `;
+        modal.classList.remove('hidden');
+        modal.onclick = () => this.closeModal();
+        lucide.createIcons();
+        setTimeout(() => document.getElementById('admin-pass-input')?.focus(), 50);
+      },
+
+      verifyAdminPassword() {
+        const input = document.getElementById('admin-pass-input');
+        const err = document.getElementById('admin-pass-error');
+        if (input && input.value.trim() === '1234') {
+          this.state.isAdminUnlocked = true;
+          this.closeModal();
+          this.navigate('admin');
+          this.notify('Painel Administrativo liberado!');
+        } else if (err) {
+          err.classList.remove('hidden');
+        }
+      },
+
+      exportDatabaseJSON() {
+        const data = {
+          modules: this.state.modules,
+          lessons: this.state.lessons,
+          signs: this.state.signs,
+          challenges: this.state.challenges
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'candi-libras-backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        this.notify('Backup exportado com sucesso!');
+      },
+
+      importDatabaseJSON(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if (Array.isArray(parsed.modules)) this.state.modules = parsed.modules;
+            if (Array.isArray(parsed.lessons)) this.state.lessons = parsed.lessons;
+            if (Array.isArray(parsed.signs)) this.state.signs = parsed.signs;
+            if (Array.isArray(parsed.challenges)) this.state.challenges = parsed.challenges;
+            await this.persistAll();
+            this.renderAll();
+            this.notify('Dados importados com sucesso!');
+          } catch (err) {
+            this.notify('Arquivo JSON inválido.');
+          }
+        };
+        reader.readAsText(file);
+      },
+
+      // =======================================================================
+      // RENDERIZAÇÃO DE COMPONENTES VISUAIS
+      // =======================================================================
+      renderSignCardHTML(sign) {
+        const isPracticed = this.state.practicedIds.includes(sign.id);
+        const activeParam = this.state.openParamCard[sign.id] || null;
+        const glosa = (sign.vlibrasGlosa || sign.name || 'SINAL').toUpperCase();
+        const escapedName = (sign.vlibrasGlosa || sign.name || '').replace(/'/g, "\\'");
+
+        const paramMap = {
+          mao: { label: 'Como deixar a mão', val: sign.handshape || 'Movimento natural' },
+          local: { label: 'Onde fazer o sinal', val: sign.location || 'À frente do corpo' },
+          expressao: { label: 'Expressão do rosto', val: sign.expression || 'Expressão natural' }
+        };
+
+        return `
+          <div class="rounded-2xl overflow-hidden candi-elevated flex flex-col justify-between">
+            <!-- Topo Oficial Base VLibras -->
+            <div class="px-3.5 py-2 flex items-center justify-between text-[11px] font-extrabold border-b border-current/10">
+              <span class="px-2 py-0.5 rounded-lg bg-[#1351B4] text-white">VLIBRAS GOV.BR</span>
+              <span class="opacity-75 truncate">GLOSA: ${glosa}</span>
+            </div>
+
+            <!-- Acionador Direto do Widget VLibras ou Vídeo da Candi -->
+            <div class="p-3.5 flex flex-col items-center text-center space-y-3">
+              ${
+                sign.videoUrl
+                  ? `<video src="${sign.videoUrl}" controls loop class="w-full aspect-video rounded-xl bg-black object-contain"></video>`
+                  : ''
+              }
+
+              <button type="button" onclick="app.triggerVLibras('${escapedName}')" class="w-full py-3 px-3 rounded-xl btn-vlibras-3d flex items-center justify-center gap-2 text-xs">
+                <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                <span>SINALIZAR NO VLIBRAS (${glosa})</span>
+              </button>
+
+              ${
+                sign.candiExplanation
+                  ? `<div class="text-xs font-semibold opacity-90 px-1">${makeClickableWordsHTML(
+                      sign.candiExplanation,
+                      this.state.vlibrasActivePhrase
+                    )}</div>`
+                  : ''
+              }
+
+              <div class="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                ${['mao', 'local', 'expressao']
+                  .map((k) => {
+                    const isSel = activeParam === k;
+                    const label = k === 'mao' ? 'Mão' : k === 'local' ? 'Onde' : 'Rosto';
+                    return `
+                      <button type="button" onclick="app.toggleSignParam('${sign.id}', '${k}')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold flex items-center gap-1 transition ${
+                        isSel ? 'btn-wine-3d' : 'candi-card'
+                      }">
+                        <span>${label}</span>
+                      </button>
+                    `;
+                  })
+                  .join('')}
+
+                <button type="button" onclick="app.openCameraModal('${sign.id}')" class="px-2.5 py-1.5 rounded-xl candi-card text-[11px] font-extrabold flex items-center gap-1" title="Treinar com Espelho">
+                  <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                  <span>Espelho</span>
+                </button>
+
+                <button type="button" onclick="app.togglePracticedSign('${sign.id}')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold flex items-center gap-1 ${
+                  isPracticed ? 'bg-emerald-600 text-white border-b-4 border-emerald-800' : 'candi-card opacity-80'
+                }">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  <span>${isPracticed ? 'Praticado' : 'Marcar'}</span>
+                </button>
+              </div>
+
+              ${
+                activeParam
+                  ? `
+                <div class="w-full px-3 py-2 rounded-xl bg-current/10 text-xs font-bold">
+                  <span class="opacity-70">${paramMap[activeParam].label}:</span>
+                  ${makeClickableWordsHTML(paramMap[activeParam].val, this.state.vlibrasActivePhrase)}
+                </div>
+              `
+                  : ''
+              }
+            </div>
+          </div>
+        `;
+      },
+
+      renderLessonBlockHTML(block, index, lessonId) {
+        const activeWord = this.state.vlibrasActivePhrase;
+        switch (block.type) {
+          case 'titulo':
+            return `
+              <h2 class="text-xl sm:text-2xl font-extrabold flex items-center gap-2" style="color: var(--accent-green);">
+                <i data-lucide="sparkles" class="w-5 h-5 shrink-0"></i>
+                <span>${makeClickableWordsHTML(block.content, activeWord)}</span>
+              </h2>
+            `;
+          case 'subtitulo':
+            return `<h3 class="text-base sm:text-lg font-bold opacity-85">${makeClickableWordsHTML(block.content, activeWord)}</h3>`;
+          case 'texto':
+            return `<p class="text-sm sm:text-base leading-relaxed">${makeClickableWordsHTML(block.content, activeWord)}</p>`;
+          case 'destaque':
+            return `
+              <div class="p-4 rounded-2xl candi-elevated border-l-4 flex items-start gap-3" style="border-left-color: var(--accent-wine);">
+                <i data-lucide="sparkles" class="w-5 h-5 shrink-0 mt-0.5" style="color: var(--accent-wine);"></i>
+                <div>
+                  <span class="text-xs font-extrabold uppercase block" style="color: var(--accent-wine);">${block.title || 'Destaque'}</span>
+                  <p class="text-sm font-medium mt-0.5">${makeClickableWordsHTML(block.content, activeWord)}</p>
+                </div>
+              </div>
+            `;
+          case 'lista':
+            return `
+              <div class="space-y-2">
+                ${
+                  block.title
+                    ? `<div class="text-xs font-extrabold uppercase tracking-wider opacity-70">${makeClickableWordsHTML(block.title, activeWord)}</div>`
+                    : ''
+                }
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  ${(block.items || [])
+                    .slice(0, 3)
+                    .map(
+                      (it, idx) => `
+                    <div class="p-3.5 rounded-2xl candi-elevated flex items-start gap-2.5">
+                      <span class="w-6 h-6 rounded-lg text-xs font-extrabold flex items-center justify-center shrink-0 btn-primary-3d">${idx + 1}</span>
+                      <span class="text-xs sm:text-sm font-semibold">${makeClickableWordsHTML(it, activeWord)}</span>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+              </div>
+            `;
+          case 'galeria':
+            return `
+              <div class="space-y-2">
+                ${block.title ? `<span class="text-xs font-extrabold uppercase opacity-70 block">${block.title}</span>` : ''}
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  ${(block.items || [])
+                    .slice(0, 3)
+                    .map(
+                      (it) => `
+                    <div class="p-3.5 rounded-2xl candi-elevated flex items-center gap-2.5">
+                      <i data-lucide="hand" class="w-4 h-4 shrink-0" style="color: var(--accent-green);"></i>
+                      <span class="text-xs sm:text-sm font-bold">${makeClickableWordsHTML(it, activeWord)}</span>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+              </div>
+            `;
+          case 'video':
+            return `
+              <div class="p-4 rounded-2xl candi-card space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-sm flex items-center gap-2">
+                    <i data-lucide="video" class="w-4 h-4" style="color: var(--accent-green);"></i>
+                    ${block.title || 'Demonstração'}
+                  </span>
+                  <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full candi-elevated">${block.signReference || 'Sinal'}</span>
+                </div>
+                ${this.renderSignCardHTML({
+                  id: block.id || `vid-${index}`,
+                  name: block.signReference || block.title || 'OLÁ',
+                  vlibrasGlosa: block.signReference || 'OLÁ',
+                  handshape: 'Demonstração da aula',
+                  location: 'Espaço visual',
+                  expression: block.caption || 'Olhar atento',
+                  candiExplanation: block.caption || 'Clique em qualquer palavra para sinalizar.'
+                })}
+              </div>
+            `;
+          case 'exercicio': {
+            const key = `${lessonId}-${block.id || index}`;
+            const chosen = this.state.exerciseAnswers[key];
+            const isCorrect = chosen === Number(block.correctIndex);
+            return `
+              <div class="p-4 rounded-2xl candi-elevated space-y-3">
+                <div class="flex items-center gap-2 text-xs sm:text-sm font-extrabold">
+                  <i data-lucide="check-circle-2" class="w-4 h-4" style="color: var(--accent-green);"></i>
+                  <span>${makeClickableWordsHTML(block.question, activeWord)}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  ${(block.options || [])
+                    .slice(0, 3)
+                    .map((opt, oIdx) => {
+                      const selected = chosen === oIdx;
+                      const right = Number(block.correctIndex) === oIdx;
+                      const bgClass = selected
+                        ? right
+                          ? 'bg-emerald-600 text-white border-emerald-800'
+                          : 'bg-rose-600 text-white border-rose-800'
+                        : 'candi-card';
+                      return `
+                        <button type="button" onclick="app.answerExercise('${key}', ${oIdx})" class="p-3 rounded-xl text-xs font-extrabold text-left flex items-center justify-between ${bgClass}">
+                          <span>${opt}</span>
+                          ${selected ? `<span>${right ? '✓' : '×'}</span>` : ''}
+                        </button>
+                      `;
+                    })
+                    .join('')}
+                </div>
+                ${
+                  chosen !== undefined && block.explanation
+                    ? `<p class="text-xs font-extrabold ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600'}">${block.explanation}</p>`
+                    : ''
+                }
+              </div>
+            `;
+          }
+          default:
+            return '';
+        }
+      },
+
+      // =======================================================================
+      // RENDERIZADOR DAS ABAS PRINCIPAIS
+      // =======================================================================
+      renderHomeHTML() {
+        const activeModules = this.state.modules.filter((m) => m.active !== false);
+        const currentMod = activeModules.find((m) => m.id === this.state.selectedModuleId) || activeModules[0];
+        const modLessons = this.state.lessons.filter((l) => l.moduleId === currentMod?.id && l.status !== 'draft');
+        const firstLesson = modLessons[0] || this.state.lessons[0];
+        const topChallenge = this.state.challenges[0];
+        const isChallengeDone = topChallenge && this.state.completedChallengeIds.includes(topChallenge.id);
+
+        return `
+          <div class="space-y-5">
+            <!-- 1. RESUMO ESSENCIAL EM 3 PÍLULAS VISUAIS (REGRA DE 3) -->
+            <section class="grid grid-cols-3 gap-3">
+              <button type="button" onclick="app.navigate('modulos')" class="p-3.5 rounded-2xl candi-card flex items-center gap-3 text-left">
+                <div class="p-2.5 rounded-xl candi-elevated">
+                  <i data-lucide="layers" class="w-5 h-5" style="color: var(--accent-green);"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold uppercase opacity-60 block">Módulos</span>
+                  <span class="text-sm sm:text-base font-extrabold">${activeModules.length} Etapas</span>
+                </div>
+              </button>
+
+              <button type="button" onclick="app.navigate('biblioteca')" class="p-3.5 rounded-2xl candi-card flex items-center gap-3 text-left">
+                <div class="p-2.5 rounded-xl bg-[#1351B4]/15 text-[#1351B4]">
+                  <i data-lucide="hand" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold uppercase opacity-60 block">Sinais VLibras</span>
+                  <span class="text-sm sm:text-base font-extrabold">${this.state.practicedIds.length}/${this.state.signs.length}</span>
+                </div>
+              </button>
+
+              <button type="button" onclick="app.navigate('desafios')" class="p-3.5 rounded-2xl candi-card flex items-center gap-3 text-left">
+                <div class="p-2.5 rounded-xl candi-elevated">
+                  <i data-lucide="award" class="w-5 h-5" style="color: var(--accent-wine);"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold uppercase opacity-60 block">Desafios</span>
+                  <span class="text-sm sm:text-base font-extrabold">${this.state.completedChallengeIds.length}/${this.state.challenges.length}</span>
+                </div>
+              </button>
+            </section>
+
+            <!-- 2. AULA ATUAL + TRILHA NUMERADA 1 A 5 + BONECO VLIBRAS -->
+            <section class="rounded-3xl candi-card p-6 space-y-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold uppercase px-3 py-1 rounded-xl candi-elevated" style="color: var(--accent-green);">${currentMod?.title || ''}</span>
+                  <span class="text-xs font-bold opacity-60">• ${currentMod?.duration || ''}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  ${activeModules
+                    .map(
+                      (m, idx) => `
+                    <button type="button" onclick="app.state.selectedModuleId='${m.id}'; app.renderAll();" class="w-8 h-8 rounded-xl text-xs font-extrabold flex items-center justify-center ${
+                        m.id === currentMod?.id ? 'btn-primary-3d' : 'candi-elevated opacity-70 hover:opacity-100'
+                      }">${idx + 1}</button>
+                  `
+                    )
+                    .join('')}
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-2">
+                  <span class="text-[11px] font-extrabold uppercase opacity-60 block">Aula da Vez (Toque em qualquer palavra para ver no VLibras)</span>
+                  <h1 class="text-xl sm:text-2xl font-black">${makeClickableWordsHTML(firstLesson?.title || '', this.state.vlibrasActivePhrase)}</h1>
+                  <p class="text-xs sm:text-sm opacity-80">${makeClickableWordsHTML(firstLesson?.intro || '', this.state.vlibrasActivePhrase)}</p>
+                </div>
+                <div class="shrink-0">
+                  <button type="button" onclick="app.openLesson('${firstLesson?.id}')" class="px-6 py-3.5 rounded-2xl text-xs sm:text-sm btn-primary-3d inline-flex items-center gap-2">
+                    <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                    <span>CONTINUAR AULA</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- 3. DUPLA DE ATALHOS: DESAFIO DA SEMANA + ESTÚDIO DE SINAIS -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              ${
+                topChallenge
+                  ? `
+                <div class="rounded-3xl candi-card p-5 flex flex-col justify-between gap-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-xl candi-elevated" style="color: var(--accent-wine);">Desafio da Semana</span>
+                    <span class="text-xs font-bold opacity-60">${isChallengeDone ? '✓ Concluído' : topChallenge.deadline}</span>
+                  </div>
+                  <div>
+                    <h2 class="text-base sm:text-lg font-extrabold">${makeClickableWordsHTML(topChallenge.title, this.state.vlibrasActivePhrase)}</h2>
+                    <p class="text-xs mt-0.5 opacity-80">${makeClickableWordsHTML(topChallenge.description, this.state.vlibrasActivePhrase)}</p>
+                  </div>
+                  <div class="flex items-center justify-between pt-3 border-t border-current/10">
+                    <button type="button" onclick="app.toggleCompletedChallenge('${topChallenge.id}')" class="px-3 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 ${
+                      isChallengeDone ? 'bg-emerald-600 text-white' : 'candi-elevated'
+                    }">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>${isChallengeDone ? 'Feito' : 'Marcar'}</span>
+                    </button>
+                    <button type="button" onclick="app.navigate('desafios')" class="px-4 py-2 rounded-xl text-xs btn-wine-3d flex items-center gap-1.5">
+                      <span>Abrir Desafio</span>
+                      <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </div>
+              `
+                  : ''
+              }
+
+              <div class="rounded-3xl candi-card p-5 flex flex-col justify-between gap-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-xl bg-[#1351B4] text-white">Base VLibras Gov.br</span>
+                  <span class="text-xs font-bold opacity-60">${this.state.signs.length} sinais</span>
+                </div>
+                <div>
+                  <h2 class="text-base sm:text-lg font-extrabold">Estúdio de Sinais</h2>
+                  <p class="text-xs mt-0.5 opacity-80">Ambiente próprio de estudos com Boneco VLibras e espelho.</p>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-current/10">
+                  <button type="button" onclick="app.state.studyMode='treino'; app.navigate('biblioteca');" class="px-3 py-2 rounded-xl text-xs font-extrabold candi-elevated flex items-center gap-1.5">
+                    <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                    <span>Treino 1 a 1</span>
+                  </button>
+                  <button type="button" onclick="app.state.studyMode='galeria'; app.navigate('biblioteca');" class="px-4 py-2 rounded-xl text-xs btn-primary-3d flex items-center gap-1.5">
+                    <span>Entrar no Estúdio</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        `;
+      },
+
+      renderModulesHTML() {
+        const activeModules = this.state.modules.filter((m) => m.active !== false);
+        const currentMod = activeModules.find((m) => m.id === this.state.selectedModuleId) || activeModules[0];
+        const modLessons = this.state.lessons.filter((l) => l.moduleId === currentMod?.id);
+
+        return `
+          <div class="space-y-5">
+            <div class="flex items-center gap-2 overflow-x-auto pb-1">
+              ${activeModules
+                .map(
+                  (m) => `
+                <button type="button" onclick="app.state.selectedModuleId='${m.id}'; app.renderAll();" class="px-4 py-2.5 rounded-2xl text-xs font-extrabold whitespace-nowrap flex items-center gap-2 ${
+                    m.id === currentMod?.id ? 'btn-primary-3d' : 'candi-card'
+                  }">
+                  <span>${m.title}</span>
+                </button>
+              `
+                )
+                .join('')}
+            </div>
+
+            <div class="rounded-3xl candi-card p-5 sm:p-6 space-y-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <span class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full candi-elevated">${currentMod.categoryTag} • ${currentMod.duration}</span>
+                  <h2 class="text-xl sm:text-2xl font-extrabold mt-1">${makeClickableWordsHTML(currentMod.title, this.state.vlibrasActivePhrase)}</h2>
+                  <p class="text-xs sm:text-sm opacity-80">${makeClickableWordsHTML(currentMod.description, this.state.vlibrasActivePhrase)}</p>
+                </div>
+              </div>
+
+              <!-- 3 Tópicos do Módulo -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                ${(currentMod.topics || [])
+                  .slice(0, 3)
+                  .map(
+                    (t) => `
+                  <div class="p-3 rounded-2xl candi-elevated flex items-center gap-2 text-xs font-bold">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0" style="color: var(--accent-green);"></i>
+                    <span>${makeClickableWordsHTML(t, this.state.vlibrasActivePhrase)}</span>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+
+              <!-- Lista de Aulas -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                ${modLessons
+                  .map(
+                    (les) => `
+                  <button type="button" onclick="app.openLesson('${les.id}')" class="p-4 rounded-2xl candi-elevated hover:scale-[1.01] transition flex items-center justify-between gap-3 text-left">
+                    <div>
+                      <span class="text-[10px] font-bold opacity-70 block">${les.duration}</span>
+                      <h3 class="font-extrabold text-sm sm:text-base">${les.title}</h3>
+                      <p class="text-xs opacity-75 line-clamp-1">${les.intro}</p>
+                    </div>
+                    <div class="p-2.5 rounded-xl btn-primary-3d shrink-0">
+                      <i data-lucide="play" class="w-4 h-4"></i>
+                    </div>
+                  </button>
+                `
+                  )
+                  .join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      renderSignsStudioHTML() {
+        const categories = ['Todas', ...new Set(this.state.signs.map((s) => s.category).filter(Boolean))];
+        const filtered = this.state.signs.filter((s) => {
+          const q = this.state.signSearch.trim().toLowerCase();
+          const matchQ = !q || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q);
+          const matchCat = this.state.signCategoryFilter === 'Todas' || s.category === this.state.signCategoryFilter;
+          const matchMod = this.state.signModuleFilter === 'Todos' || s.moduleId === this.state.signModuleFilter;
+          return matchQ && matchCat && matchMod;
+        });
+
+        const wordsInPhrase = this.state.customPhraseInput.split(/\s+/).filter(Boolean);
+
+        return `
+          <div class="space-y-5">
+            <!-- Tradutor Interativo Palavra por Palavra (Aciona o Plugin Oficial VLibras) -->
+            <div class="p-5 rounded-3xl candi-card space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="px-3 py-1 rounded-xl bg-[#1351B4] text-white text-xs font-extrabold">CLIQUE EM QUALQUER PALAVRA = TRADUTOR VLIBRAS</span>
+                <button type="button" onclick="app.triggerVLibras(app.state.customPhraseInput)" class="px-3.5 py-1.5 rounded-xl btn-vlibras-3d text-xs">Sinalizar Frase no VLibras</button>
+              </div>
+
+              <input
+                type="text"
+                value="${this.state.customPhraseInput.replace(/"/g, '&quot;')}"
+                oninput="app.state.customPhraseInput = this.value; app.renderAll();"
+                placeholder="Digite qualquer frase ou palavra..."
+                class="w-full px-4 py-2.5 rounded-2xl candi-elevated text-xs sm:text-sm font-bold focus:outline-none"
+              />
+
+              <div class="p-3.5 rounded-2xl candi-elevated flex flex-wrap items-center gap-2">
+                <span class="text-[11px] font-extrabold opacity-60 mr-1">Toque na palavra:</span>
+                ${wordsInPhrase
+                  .map((w) => {
+                    const clean = w.replace(/[?!.,;:]/g, '');
+                    const esc = clean.replace(/'/g, "\\'");
+                    const isCur = this.state.vlibrasActivePhrase.toLowerCase() === clean.toLowerCase();
+                    return `<button type="button" onclick="app.triggerVLibras('${esc}')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold ${
+                      isCur ? 'btn-vlibras-3d' : 'candi-card'
+                    }">${w}</button>`;
+                  })
+                  .join('')}
+              </div>
+            </div>
+
+            <!-- Filtros e Modo de Estudo (Galeria vs Treino 1 a 1) -->
+            <div class="p-4 rounded-3xl candi-card space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <input
+                  type="text"
+                  value="${this.state.signSearch.replace(/"/g, '&quot;')}"
+                  oninput="app.state.signSearch = this.value; app.renderAll();"
+                  placeholder="Buscar sinal no catálogo da Candi..."
+                  class="flex-1 min-w-[200px] px-4 py-2 rounded-2xl candi-elevated text-xs sm:text-sm font-bold focus:outline-none"
+                />
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="app.state.studyMode='galeria'; app.renderAll();" class="px-3.5 py-2 rounded-xl text-xs font-extrabold ${
+                    this.state.studyMode === 'galeria' ? 'btn-primary-3d' : 'candi-elevated'
+                  }">Galeria</button>
+                  <button type="button" onclick="app.state.studyMode='treino'; app.state.studyIndex=0; app.renderAll();" class="px-3.5 py-2 rounded-xl text-xs font-extrabold ${
+                    this.state.studyMode === 'treino' ? 'btn-wine-3d' : 'candi-elevated'
+                  }">Treino 1 a 1</button>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                ${categories
+                  .map(
+                    (cat) => `
+                  <button type="button" onclick="app.state.signCategoryFilter='${cat}'; app.renderAll();" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap ${
+                      this.state.signCategoryFilter === cat ? 'btn-primary-3d' : 'candi-elevated'
+                    }">${cat}</button>
+                `
+                  )
+                  .join('')}
+              </div>
+            </div>
+
+            ${
+              this.state.studyMode === 'treino' && filtered.length > 0
+                ? (() => {
+                    const idx = Math.min(this.state.studyIndex, filtered.length - 1);
+                    const cur = filtered[idx];
+                    return `
+                      <div class="rounded-3xl candi-card p-5 space-y-4">
+                        <div class="flex items-center justify-between">
+                          <span class="text-xs font-extrabold px-3 py-1 rounded-xl candi-elevated">Sinal ${idx + 1} de ${filtered.length}</span>
+                          <div class="flex items-center gap-2">
+                            <button type="button" onclick="app.state.studyIndex = ${idx > 0 ? idx - 1 : filtered.length - 1}; app.renderAll();" class="p-2 rounded-xl candi-elevated">Anterior</button>
+                            <button type="button" onclick="app.state.studyIndex = ${idx < filtered.length - 1 ? idx + 1 : 0}; app.renderAll();" class="p-2 rounded-xl btn-primary-3d">Próximo</button>
+                          </div>
+                        </div>
+                        <div class="max-w-lg mx-auto">
+                          <h2 class="text-2xl font-black text-center mb-3">${cur.name}</h2>
+                          ${this.renderSignCardHTML(cur)}
+                        </div>
+                      </div>
+                    `;
+                  })()
+                : `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  ${filtered
+                    .map(
+                      (s) => `
+                    <div class="rounded-3xl candi-card p-4 space-y-3">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full candi-elevated">${s.category}</span>
+                          <h2 class="text-lg font-black mt-0.5">${makeClickableWordsHTML(s.name, this.state.vlibrasActivePhrase)}</h2>
+                        </div>
+                      </div>
+                      ${this.renderSignCardHTML(s)}
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+              `
+            }
+          </div>
+        `;
+      },
+
+      renderChallengesHTML() {
+        return `
+          <div class="space-y-5">
+            <div class="rounded-3xl candi-card p-4 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="camera" class="w-5 h-5" style="color: var(--accent-wine);"></i>
+                <div>
+                  <h2 class="text-sm font-extrabold">Espelho de Prática para os Desafios</h2>
+                  <p class="text-xs opacity-75">Grave e revise sua sinalização diretamente no navegador.</p>
+                </div>
+              </div>
+              <button type="button" onclick="app.openCameraModal()" class="px-4 py-2 rounded-xl text-xs btn-wine-3d">Abrir Espelho de Vídeo</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              ${this.state.challenges
+                .map((c) => {
+                  const steps = (c.guidelines || '').split('\n').filter(Boolean).slice(0, 3);
+                  const isDone = this.state.completedChallengeIds.includes(c.id);
+                  return `
+                    <div class="rounded-3xl candi-card p-5 flex flex-col justify-between gap-4">
+                      <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                          <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full candi-elevated" style="color: var(--accent-wine);">${c.activityType}</span>
+                          <button type="button" onclick="app.toggleCompletedChallenge('${c.id}')" class="px-2.5 py-1 rounded-xl text-xs font-extrabold ${
+                    isDone ? 'bg-emerald-600 text-white' : 'candi-elevated'
+                  }">${isDone ? '✓ Concluído' : 'Marcar'}</button>
+                        </div>
+                        <div>
+                          <h3 class="text-base font-extrabold">${makeClickableWordsHTML(c.title, this.state.vlibrasActivePhrase)}</h3>
+                          <p class="text-xs opacity-80">${makeClickableWordsHTML(c.description, this.state.vlibrasActivePhrase)}</p>
+                        </div>
+                        <div class="space-y-1.5">
+                          ${steps
+                            .map(
+                              (st) => `
+                            <div class="p-2.5 rounded-xl candi-elevated text-xs font-semibold">${makeClickableWordsHTML(
+                              st,
+                              this.state.vlibrasActivePhrase
+                            )}</div>
+                          `
+                            )
+                            .join('')}
+                        </div>
+                      </div>
+                      <div class="pt-3 border-t border-current/10 flex flex-wrap gap-1.5">
+                        ${(c.attachments || [])
+                          .map((att) => {
+                            const esc = att.replace(/'/g, "\\'");
+                            return `<button type="button" onclick="app.triggerVLibras('${esc}')" class="text-[10px] font-extrabold px-2.5 py-1 rounded-lg btn-vlibras-3d">${att}</button>`;
+                          })
+                          .join('')}
+                      </div>
+                    </div>
+                  `;
+                })
+                .join('')}
+            </div>
+          </div>
+        `;
+      },
+
+      // =======================================================================
+      // PAINEL ADMINISTRATIVO COMPLETO (MÓDULOS, AULAS, SINAIS E DESAFIOS)
+      // =======================================================================
+      renderAdminHTML() {
+        const sub = this.state.adminSubTab;
+        return `
+          <div class="space-y-5">
+            <div class="p-3.5 rounded-2xl candi-card flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-1.5">
+                ${[
+                  { id: 'modulos', label: `Módulos (${this.state.modules.length})` },
+                  { id: 'aulas', label: `Aulas (${this.state.lessons.length})` },
+                  { id: 'sinais', label: `Sinais (${this.state.signs.length})` },
+                  { id: 'desafios', label: `Desafios (${this.state.challenges.length})` }
+                ]
+                  .map(
+                    (t) => `
+                  <button type="button" onclick="app.state.adminSubTab='${t.id}'; app.renderAll();" class="px-3.5 py-2 rounded-xl text-xs font-extrabold ${
+                      sub === t.id ? 'btn-primary-3d' : 'candi-elevated'
+                    }">${t.label}</button>
+                `
+                  )
+                  .join('')}
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="app.exportDatabaseJSON()" class="px-3 py-2 rounded-xl candi-elevated text-xs font-extrabold">Exportar Backup</button>
+                <label class="px-3 py-2 rounded-xl candi-elevated text-xs font-extrabold cursor-pointer">
+                  Importar JSON
+                  <input type="file" accept=".json" onchange="app.importDatabaseJSON(event)" class="hidden" />
+                </label>
+                <button type="button" onclick="app.state.isAdminUnlocked=false; app.navigate('inicio');" class="px-3 py-2 rounded-xl bg-rose-600 text-white text-xs font-extrabold">Sair</button>
+              </div>
+            </div>
+
+            ${
+              sub === 'sinais'
+                ? `
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                <div class="md:col-span-6 space-y-2">
+                  ${this.state.signs
+                    .map(
+                      (s) => `
+                    <div class="p-3 rounded-2xl candi-card flex items-center justify-between">
+                      <div>
+                        <span class="font-extrabold text-sm block">${s.name}</span>
+                        <span class="text-xs opacity-70">${s.category}</span>
+                      </div>
+                      <button type="button" onclick="app.deleteSign('${s.id}')" class="p-2 rounded-xl bg-rose-600/15 text-rose-500 text-xs font-bold">Excluir</button>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+                <form onsubmit="event.preventDefault(); app.createQuickSign();" class="md:col-span-6 p-5 rounded-3xl candi-card space-y-3 text-xs">
+                  <h3 class="font-extrabold text-sm">Cadastrar Novo Sinal</h3>
+                  <input id="new-sign-name" required placeholder="Nome do Sinal (ex: BOM DIA)" class="w-full px-3 py-2.5 rounded-xl candi-elevated font-bold" />
+                  <input id="new-sign-cat" required placeholder="Categoria (ex: Saudações)" class="w-full px-3 py-2.5 rounded-xl candi-elevated font-bold" />
+                  <div class="grid grid-cols-3 gap-2">
+                    <input id="new-sign-hand" placeholder="Mão" class="px-3 py-2 rounded-xl candi-elevated" />
+                    <input id="new-sign-loc" placeholder="Onde (ex: Testa)" class="px-3 py-2 rounded-xl candi-elevated" />
+                    <input id="new-sign-exp" placeholder="Rosto" class="px-3 py-2 rounded-xl candi-elevated" />
+                  </div>
+                  <input id="new-sign-desc" placeholder="Explicação curta da Candi" class="w-full px-3 py-2.5 rounded-xl candi-elevated" />
+                  <button type="submit" class="w-full py-2.5 rounded-xl btn-primary-3d">Salvar Sinal</button>
+                </form>
+              </div>
+            `
+                : sub === 'modulos'
+                ? `
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                <div class="md:col-span-6 space-y-2">
+                  ${this.state.modules
+                    .map(
+                      (m) => `
+                    <div class="p-3 rounded-2xl candi-card flex items-center justify-between">
+                      <span class="font-extrabold text-sm">${m.title} (${m.duration})</span>
+                      <button type="button" onclick="app.deleteModule('${m.id}')" class="p-2 rounded-xl bg-rose-600/15 text-rose-500 text-xs font-bold">Excluir</button>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+                <form onsubmit="event.preventDefault(); app.createQuickModule();" class="md:col-span-6 p-5 rounded-3xl candi-card space-y-3 text-xs">
+                  <h3 class="font-extrabold text-sm">Novo Módulo Personalizado</h3>
+                  <input id="new-mod-title" required placeholder="Título do Módulo" class="w-full px-3 py-2.5 rounded-xl candi-elevated font-bold" />
+                  <input id="new-mod-dur" required placeholder="Duração (ex: 4 sem)" class="w-full px-3 py-2.5 rounded-xl candi-elevated" />
+                  <input id="new-mod-desc" required placeholder="Descrição curta" class="w-full px-3 py-2.5 rounded-xl candi-elevated" />
+                  <button type="submit" class="w-full py-2.5 rounded-xl btn-primary-3d">Adicionar Módulo</button>
+                </form>
+              </div>
+            `
+                : sub === 'desafios'
+                ? `
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                <div class="md:col-span-6 space-y-2">
+                  ${this.state.challenges
+                    .map(
+                      (c) => `
+                    <div class="p-3 rounded-2xl candi-card flex items-center justify-between">
+                      <span class="font-extrabold text-sm">${c.title}</span>
+                      <button type="button" onclick="app.deleteChallenge('${c.id}')" class="p-2 rounded-xl bg-rose-600/15 text-rose-500 text-xs font-bold">Excluir</button>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+                <form onsubmit="event.preventDefault(); app.createQuickChallenge();" class="md:col-span-6 p-5 rounded-3xl candi-card space-y-3 text-xs">
+                  <h3 class="font-extrabold text-sm">Publicar Desafio da Semana</h3>
+                  <input id="new-chal-title" required placeholder="Título do Desafio" class="w-full px-3 py-2.5 rounded-xl candi-elevated font-bold" />
+                  <input id="new-chal-desc" required placeholder="Objetivo curto" class="w-full px-3 py-2.5 rounded-xl candi-elevated" />
+                  <textarea id="new-chal-steps" rows="3" placeholder="3 passos (1 por linha)" class="w-full px-3 py-2 rounded-xl candi-elevated"></textarea>
+                  <button type="submit" class="w-full py-2.5 rounded-xl btn-wine-3d">Publicar Desafio</button>
+                </form>
+              </div>
+            `
+                : `
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                <div class="md:col-span-6 space-y-2">
+                  ${this.state.lessons
+                    .map(
+                      (l) => `
+                    <div class="p-3 rounded-2xl candi-card flex items-center justify-between">
+                      <div>
+                        <span class="font-extrabold text-sm block">${l.title}</span>
+                        <span class="text-xs opacity-70">${l.duration}</span>
+                      </div>
+                      <button type="button" onclick="app.deleteLesson('${l.id}')" class="p-2 rounded-xl bg-rose-600/15 text-rose-500 text-xs font-bold">Excluir</button>
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+                <form onsubmit="event.preventDefault(); app.createQuickLesson();" class="md:col-span-6 p-5 rounded-3xl candi-card space-y-3 text-xs">
+                  <h3 class="font-extrabold text-sm">Criar Nova Aula</h3>
+                  <input id="new-les-title" required placeholder="Título da Aula" class="w-full px-3 py-2.5 rounded-xl candi-elevated font-bold" />
+                  <select id="new-les-mod" class="w-full px-3 py-2.5 rounded-xl candi-elevated font-bold">
+                    ${this.state.modules.map((m) => `<option value="${m.id}">${m.title}</option>`).join('')}
+                  </select>
+                  <input id="new-les-intro" required placeholder="Resumo da aula" class="w-full px-3 py-2.5 rounded-xl candi-elevated" />
+                  <textarea id="new-les-content" rows="3" placeholder="Explicação principal da aula" class="w-full px-3 py-2 rounded-xl candi-elevated"></textarea>
+                  <button type="submit" class="w-full py-2.5 rounded-xl btn-primary-3d">Publicar Aula</button>
+                </form>
+              </div>
+            `
+            }
+          </div>
+        `;
+      },
+
+      createQuickSign() {
+        const name = document.getElementById('new-sign-name').value.trim().toUpperCase();
+        const category = document.getElementById('new-sign-cat').value.trim();
+        const handshape = document.getElementById('new-sign-hand').value.trim() || 'Natural';
+        const location = document.getElementById('new-sign-loc').value.trim() || 'Neutro';
+        const expression = document.getElementById('new-sign-exp').value.trim() || 'Atenta';
+        const candiExplanation = document.getElementById('new-sign-desc').value.trim();
+        if (!name) return;
+
+        this.state.signs.push({
+          id: 'sig-' + Date.now(),
+          name,
+          vlibrasGlosa: name,
+          category,
+          moduleId: 'mod-1',
+          handshape,
+          location,
+          expression,
+          candiExplanation
+        });
+        this.persistAll();
+        this.notify('Sinal adicionado!');
+        this.renderAll();
+      },
+
+      deleteSign(id) {
+        this.state.signs = this.state.signs.filter((s) => s.id !== id);
+        this.persistAll();
+        this.renderAll();
+      },
+
+      createQuickModule() {
+        const title = document.getElementById('new-mod-title').value.trim();
+        const duration = document.getElementById('new-mod-dur').value.trim();
+        const description = document.getElementById('new-mod-desc').value.trim();
+        if (!title) return;
+        this.state.modules.push({
+          id: 'mod-' + Date.now(),
+          order: this.state.modules.length + 1,
+          title,
+          duration,
+          active: true,
+          categoryTag: 'Personalizado',
+          description,
+          topics: ['Prática visual', 'Sinais do módulo', 'Revisão']
+        });
+        this.persistAll();
+        this.notify('Módulo salvo!');
+        this.renderAll();
+      },
+
+      deleteModule(id) {
+        this.state.modules = this.state.modules.filter((m) => m.id !== id);
+        this.persistAll();
+        this.renderAll();
+      },
+
+      createQuickChallenge() {
+        const title = document.getElementById('new-chal-title').value.trim();
+        const description = document.getElementById('new-chal-desc').value.trim();
+        const guidelines = document.getElementById('new-chal-steps').value.trim();
+        if (!title) return;
+        this.state.challenges.unshift({
+          id: 'chal-' + Date.now(),
+          title,
+          description,
+          guidelines: guidelines || '1. Praticar sinal\n2. Gravar no espelho',
+          deadline: 'Próxima aula',
+          activityType: 'Prática',
+          status: 'published',
+          attachments: [title.toUpperCase()]
+        });
+        this.persistAll();
+        this.notify('Desafio publicado!');
+        this.renderAll();
+      },
+
+      deleteChallenge(id) {
+        this.state.challenges = this.state.challenges.filter((c) => c.id !== id);
+        this.persistAll();
+        this.renderAll();
+      },
+
+      createQuickLesson() {
+        const title = document.getElementById('new-les-title').value.trim();
+        const moduleId = document.getElementById('new-les-mod').value;
+        const intro = document.getElementById('new-les-intro').value.trim();
+        const content = document.getElementById('new-les-content').value.trim();
+        if (!title) return;
+        this.state.lessons.push({
+          id: 'les-' + Date.now(),
+          moduleId,
+          order: this.state.lessons.length + 1,
+          title,
+          status: 'published',
+          duration: '45m',
+          intro,
+          blocks: [
+            { id: 'b-' + Date.now(), type: 'titulo', content: title },
+            { id: 'b2-' + Date.now(), type: 'destaque', title: 'Explicação da Candi', content: content || intro }
+          ]
+        });
+        this.persistAll();
+        this.notify('Aula publicada!');
+        this.renderAll();
+      },
+
+      deleteLesson(id) {
+        this.state.lessons = this.state.lessons.filter((l) => l.id !== id);
+        this.persistAll();
+        this.renderAll();
+      },
+
+      // =======================================================================
+      // CICLO DE RENDERIZAÇÃO PRINCIPAL
+      // =======================================================================
+      renderAll() {
+        // Atualiza cabeçalho
+        const vlibrasLabel = document.getElementById('header-vlibras-label');
+        if (vlibrasLabel) vlibrasLabel.textContent = `VLibras: ${this.state.vlibrasActivePhrase.slice(0, 12)}`;
+
+        const progressCount = document.getElementById('header-progress-count');
+        if (progressCount) progressCount.textContent = `${this.state.practicedIds.length}/${this.state.signs.length}`;
+
+        const themeIcon = document.getElementById('theme-icon');
+        if (themeIcon) themeIcon.setAttribute('data-lucide', this.state.theme === 'light' ? 'moon' : 'sun');
+
+        const adminIcon = document.getElementById('admin-lock-icon');
+        if (adminIcon) adminIcon.setAttribute('data-lucide', this.state.isAdminUnlocked ? 'sliders' : 'lock');
+
+        // Renderiza Conteúdo Principal
+        const mainEl = document.getElementById('app-main');
+        const activeLesson = this.state.lessons.find((l) => l.id === this.state.activeLessonId);
+
+        if (activeLesson) {
+          mainEl.innerHTML = `
+            <div class="space-y-5">
+              <button type="button" onclick="app.state.activeLessonId=null; app.renderAll();" class="px-4 py-2 rounded-xl candi-card text-xs font-extrabold inline-flex items-center gap-1.5">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                <span>Voltar</span>
+              </button>
+              <article class="rounded-3xl candi-card p-6 space-y-6">
+                <div class="border-b border-current/10 pb-4">
+                  <span class="text-xs font-extrabold opacity-70">${activeLesson.duration}</span>
+                  <h1 class="text-2xl font-black mt-0.5">${makeClickableWordsHTML(activeLesson.title, this.state.vlibrasActivePhrase)}</h1>
+                </div>
+                <div class="space-y-5">
+                  ${(activeLesson.blocks || []).map((b, i) => this.renderLessonBlockHTML(b, i, activeLesson.id)).join('')}
+                </div>
+              </article>
+            </div>
+          `;
+        } else if (this.state.activeTab === 'inicio') {
+          mainEl.innerHTML = this.renderHomeHTML();
+        } else if (this.state.activeTab === 'modulos') {
+          mainEl.innerHTML = this.renderModulesHTML();
+        } else if (this.state.activeTab === 'biblioteca') {
+          mainEl.innerHTML = this.renderSignsStudioHTML();
+        } else if (this.state.activeTab === 'desafios') {
+          mainEl.innerHTML = this.renderChallengesHTML();
+        } else if (this.state.activeTab === 'admin' && this.state.isAdminUnlocked) {
+          mainEl.innerHTML = this.renderAdminHTML();
+        }
+
+        // Renderiza Dock Inferior de Ícones
+        const dockEl = document.getElementById('bottom-dock');
+        const navItems = [
+          { id: 'inicio', label: 'Início', icon: 'compass' },
+          { id: 'modulos', label: 'Módulos', icon: 'book-open' },
+          { id: 'biblioteca', label: 'Estúdio Sinais', icon: 'hand' },
+          { id: 'desafios', label: 'Desafios', icon: 'award' }
+        ];
+        if (this.state.isAdminUnlocked) {
+          navItems.push({ id: 'admin', label: 'Admin', icon: 'sliders' });
+        }
+
+        dockEl.innerHTML = navItems
+          .map((item) => {
+            const isCur = this.state.activeTab === item.id && !this.state.activeLessonId;
+            const activeClass = isCur ? (item.id === 'desafios' || item.id === 'admin' ? 'btn-wine-3d' : 'btn-primary-3d') : 'hover:bg-current/5';
+            return `
+              <button type="button" onclick="app.navigate('${item.id}')" class="px-4 py-2.5 rounded-xl flex flex-col sm:flex-row items-center gap-1 sm:gap-2 transition ${activeClass}">
+                <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                <span class="text-[10px] sm:text-xs font-extrabold">${item.label}</span>
+              </button>
+            `;
+          })
+          .join('');
+
+        lucide.createIcons();
+      }
+    };
+
+    window.app = app;
+    window.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>
